@@ -1,0 +1,28 @@
+node
+{
+	stage ('Code Checkout') 
+	{
+		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git', url: 'git@github.com:AlexViki/laba7_jenkins_sonarqube.git']]])
+	}
+	
+	stage ('Code Quality')
+	{
+		script
+		{
+			def scannerHome = tool 'SonarQubeScaner';
+			withSonarQubeEnv("SonarQubeServer")
+			{
+				sh "${tool("SonarQubeScaner")}/bin/sonar-scanner"
+            }
+        }
+	}
+	
+	stage ('Build')
+	{
+		script
+		{
+			echo '----BUILD----'
+			sh 'pwd'
+		}
+	}
+}
