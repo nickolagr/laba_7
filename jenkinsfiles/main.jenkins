@@ -2,7 +2,7 @@ node
 {
 	stage ('Code Checkout') 
 	{
-		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git', url: 'git@github.com:AlexViki/laba7_jenkins_sonarqube.git']]])
+		checkout([$class: 'GitSCM', branches: [[name: '*/sonar_gate']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git', url: 'git@github.com:AlexViki/laba7_jenkins_sonarqube.git']]])
 	}
 	
 	stage ('Code Quality')
@@ -16,6 +16,20 @@ node
             }
         }
 	}
+	
+	stage("Quality Gate")
+	{
+		sleep(60)
+		timeout(time: 1, unit: 'MINUTES')
+		{
+			def qg = waitForQualityGate()
+			print "Finished waiting"
+			if (qg.status != 'OK')
+				{
+					error "Pipeline aborted due to quality gate failure: ${qg.status}"
+				}
+		}
+    }
 	
 	stage ('Build')
 	{
