@@ -7,14 +7,12 @@ node
 	
 	stage ('Code Quality')
 	{
-		script
-		{
-			def scannerHome = tool 'SonarQubeScaner';
-			withSonarQubeEnv("SonarQubeServer")
-			{
-				sh "${tool("SonarQubeScaner")}/bin/sonar-scanner"
+		script {
+      def scannerHome = tool name: 'sonscan', type: 'hudson.plugins.sonar.SonarRunnerInstallation';
+      withSonarQubeEnv("sonar") {
+      sh """${scannerHome}/bin/sonar-scanner"""
+               }
             }
-        }
 	}
 	
 	stage("Quality Gate")
